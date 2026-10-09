@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bearing</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%232a78d6'/%3E%3Cpath d='M16 5l4 11-4 11-4-11z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f3f2ee;
+  --surface: #fcfcfb;
+  --surface-2: #f0efeb;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --muted: #7d7c77;
+  --border: #e2e0da;
+  --accent: #2a78d6;
+  --accent-soft: #e3eefb;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --critical: #d03b3b;
+  --earlier: #6b7a99;
+  --none: #cbc9c2;
+  --cell-empty: #ebe9e4;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121211;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --text: #ffffff;
+    --text-2: #c3c2b7;
+    --muted: #8f8e86;
+    --border: #2f2f2c;
+    --accent: #3987e5;
+    --accent-soft: #1c2b40;
+    --earlier: #8c9bb8;
+    --none: #4a4a46;
+    --cell-empty: #262624;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --text: #ffffff;
+  --text-2: #c3c2b7;
+  --muted: #8f8e86;
+  --border: #2f2f2c;
+  --accent: #3987e5;
+  --accent-soft: #1c2b40;
+  --earlier: #8c9bb8;
+  --none: #4a4a46;
+  --cell-empty: #262624;
+  --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+a { color: var(--accent); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+/* Top bar */
+header.top { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+.top-row { display: flex; align-items: center; gap: 16px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 650; font-size: 18px; letter-spacing: -.01em; }
+.brand svg { width: 26px; height: 26px; }
+.top-row .spacer { flex: 1; }
+select.project { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
+.btn { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.danger { color: var(--critical); }
+.btn:disabled { opacity: .5; cursor: default; }
+.icon-btn { background: none; border: 0; cursor: pointer; padding: 6px; border-radius: 8px; color: var(--text-2); }
+.icon-btn:hover { background: var(--surface-2); }
+nav.tabs { display: flex; gap: 4px; overflow-x: auto; }
+nav.tabs button { background: none; border: 0; padding: 10px 14px; cursor: pointer; color: var(--text-2); border-bottom: 2px solid transparent; white-space: nowrap; }
+nav.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+
+main { padding: 28px 0 80px; }
+h1 { font-size: 26px; line-height: 1.25; letter-spacing: -.02em; margin: 0 0 6px; font-weight: 650; }
+h2 { font-size: 17px; margin: 0 0 14px; font-weight: 650; letter-spacing: -.01em; }
+h3 { font-size: 14px; margin: 18px 0 8px; font-weight: 650; }
+.sub { color: var(--text-2); margin: 0 0 24px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.grid { display: grid; gap: 16px; }
+.cols-2 { grid-template-columns: 1.4fr 1fr; }
+@media (max-width: 860px) { .cols-2 { grid-template-columns: 1fr; } }
+.stack > * + * { margin-top: 16px; }
+
+/* Stat tiles */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.tile .label { color: var(--text-2); font-size: 13px; }
+.tile .value { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .note { color: var(--muted); font-size: 12px; }
+
+/* Rating chips */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 550; padding: 2px 9px 2px 4px; border-radius: 999px; background: var(--surface-2); color: var(--text); white-space: nowrap; }
+.dot { width: 16px; height: 16px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; font-weight: 800; color: #fff; flex: none; }
+:is(.dot, .cell).r-on_course { background: var(--good); }
+:is(.dot, .cell).r-drifting { background: var(--warning); color: #3a2a00; }
+:is(.dot, .cell).r-off_course { background: var(--critical); }
+:is(.dot, .cell).r-earlier_heading { background: var(--earlier); }
+:is(.dot, .cell).r-no_progress { background: var(--none); color: var(--text); }
+.pill { display: inline-block; white-space: nowrap; flex: none; font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-2); }
+.pill.you { border-color: var(--accent); color: var(--accent); }
+.pill.claude { border-color: var(--warning); color: var(--text); background: color-mix(in srgb, var(--warning) 14%, transparent); }
+
+/* Goals */
+.goal { display: grid; grid-template-columns: 44px 1fr; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.goal:first-of-type { border-top: 0; padding-top: 0; }
+.goal .id { font-weight: 700; color: var(--accent); }
+.bar { height: 8px; background: var(--cell-empty); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.bar > span { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.goal .meta { grid-column: 2; font-size: 12.5px; color: var(--muted); }
+
+/* Attention list */
+.attn { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--border); }
+.attn:first-child { border-top: 0; padding-top: 0; }
+.attn .body { flex: 1; min-width: 0; }
+.attn .title { font-weight: 600; }
+
+/* Course map grid */
+.map-scroll { overflow-x: auto; padding-bottom: 6px; }
+.map { display: grid; gap: 3px; align-items: center; min-width: max-content; }
+.map .rowlabel { font-size: 12.5px; color: var(--text-2); padding-right: 10px; white-space: nowrap; position: sticky; left: 0; background: var(--surface); z-index: 1; height: 100%; display: flex; align-items: center; }
+.map .rowlabel b { color: var(--text); margin-right: 6px; }
+.cell { width: 26px; height: 26px; border-radius: 5px; background: var(--cell-empty); border: 0; padding: 0; cursor: pointer; display: grid; place-items: center; font-size: 11px; font-weight: 800; color: #fff; position: relative; }
+.cell.hit { background: var(--accent); }
+.cell.flag { background: transparent; box-shadow: inset 0 0 0 2px var(--warning); }
+.cell.flag.bad { box-shadow: inset 0 0 0 2px var(--critical); }
+.cell:hover, .cell:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.cell.fixed::after { content: ""; position: absolute; right: -2px; top: -2px; width: 8px; height: 8px; border-radius: 50%; background: var(--text); border: 2px solid var(--surface); }
+.map .colhead { font-size: 11px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+.map .change { width: 2px; height: 100%; background: var(--text-2); border-radius: 1px; justify-self: center; opacity: .5; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; font-size: 12.5px; color: var(--text-2); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.swatch { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+/* Tooltip */
+#tip { position: fixed; z-index: 50; pointer-events: none; background: var(--text); color: var(--bg); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; max-width: 300px; box-shadow: 0 6px 20px rgba(0,0,0,.2); opacity: 0; transition: opacity .08s; }
+#tip.show { opacity: 1; }
+#tip b { display: block; }
+
+/* Logbook */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.toolbar input[type=search] { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+.seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 2px; }
+.seg button { border: 0; background: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; color: var(--text-2); font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.entry { cursor: pointer; }
+.entry:hover { border-color: var(--muted); }
+.entry .head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.entry .headline { font-weight: 600; font-size: 15.5px; }
+.entry p { margin: 0; color: var(--text-2); }
+.change-banner { display: flex; gap: 10px; align-items: center; color: var(--text-2); font-size: 13px; padding: 4px 6px; }
+.change-banner::before, .change-banner::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+/* North Star */
+ul.clean { margin: 0; padding-left: 18px; }
+ul.clean li + li { margin-top: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--text-2); font-weight: 600; font-size: 12.5px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Spend chart */
+.chart { width: 100%; height: 260px; display: block; }
+.chart .gridline { stroke: var(--border); stroke-width: 1; }
+.chart .axis { fill: var(--muted); font-size: 11px; }
+.chart .barmark { fill: var(--accent); }
+.chart .barmark.dim { opacity: .35; }
+.chart .hit { fill: transparent; cursor: pointer; }
+
+/* Drawer */
+#scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); opacity: 0; pointer-events: none; transition: opacity .15s; z-index: 30; }
+#scrim.open { opacity: 1; pointer-events: auto; }
+#drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--surface); border-left: 1px solid var(--border); transform: translateX(100%); transition: transform .2s ease; z-index: 40; overflow-y: auto; padding: 22px 24px 40px; }
+#drawer.open { transform: none; }
+#drawer .close { position: absolute; top: 14px; right: 14px; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--text-2); font-size: 13px; margin: 6px 0 14px; }
+.flag-line { padding: 8px 10px; border-radius: 8px; background: var(--surface-2); margin-top: 6px; font-size: 13.5px; }
+.decision { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
+.actions { display: grid; gap: 10px; margin-top: 10px; }
+.action-row { display: flex; gap: 8px; }
+.action-row input { flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
+textarea.prompt { width: 100%; min-height: 220px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.notice { padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); font-size: 13.5px; margin-top: 10px; }
+.notice.err { background: color-mix(in srgb, var(--critical) 14%, transparent); }
+.empty { text-align: center; padding: 60px 20px; color: var(--text-2); }
+code { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Onboarding */
+.progress { height: 10px; background: var(--cell-empty); border-radius: 5px; overflow: hidden; margin: 14px 0 8px; }
+.progress > span { display: block; height: 100%; background: var(--accent); border-radius: 5px; transition: width .4s; }
+.progress.indeterminate > span { width: 30%; animation: slide 1.4s ease-in-out infinite; }
+@keyframes slide { from { margin-left: -30%; } to { margin-left: 100%; } }
+.candidate { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.candidate:first-child { border-top: 0; }
+.candidate .body { flex: 1; min-width: 0; }
+.candidate .p { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.change-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 12px 0; border-top: 1px solid var(--border); align-items: start; }
+.change-row:first-child { border-top: 0; }
+label.check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+label.check input { margin-top: 4px; }
+
+/* New project chat */
+.chat { display: flex; flex-direction: column; gap: 12px; }
+.msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; }
+.msg.bearing { background: var(--surface); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg.user { background: var(--accent); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg.typing { color: var(--muted); }
+.composer { display: flex; gap: 8px; margin-top: 16px; }
+.composer textarea { flex: 1; min-height: 46px; max-height: 160px; resize: vertical; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 12.5px; color: var(--text-2); }
+.field input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.header-row { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  .top-row { gap: 8px; }
+  .brand span { display: none; }
+  h1 { font-size: 21px; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5l4.5 11L16 27l-4.5-11z" fill="var(--accent)"/><circle cx="16" cy="16" r="1.8" fill="var(--surface)"/></svg>
+        <span>Bearing</span>
+      </div>
+      <select class="project" id="projectSelect" aria-label="Project"></select>
+      <div class="spacer"></div>
+      <button class="btn" id="newBtn">+ New project</button>
+      <button class="btn" id="updateBtn" title="Write Logbook entries and drift checks for new work">Update now</button>
+      <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+</header>
+
+<main><div class="wrap" id="view"><div class="empty">Loading…</div></div></main>
+
+<div id="tip" role="tooltip"></div>
+<div id="scrim"></div>
+<aside id="drawer" aria-hidden="true" aria-label="Leg details"></aside>
+
+<script>
+const TABS = [["overview", "Overview"], ["map", "Course map"], ["logbook", "Logbook"], ["star", "North Star"], ["spend", "Spend"]];
+const RATINGS = {
+  on_course: { label: "On course", icon: "✓" },
+  drifting: { label: "Drifting", icon: "!" },
+  off_course: { label: "Off course", icon: "✕" },
+  earlier_heading: { label: "Earlier heading", icon: "↺" },
+  no_progress: { label: "No progress", icon: "·" },
+};
+const FIX_LABELS = { accept: "Accepted by you", defer: "Deferred", rollback: "Rolled back", "fix-prompt": "Fix requested" };
+const state = { project: null, data: null, tab: "overview", filter: "all", query: "" };
+
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (n) => "$" + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const compact = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
+const fmtDate = (iso, opts = { month: "short", day: "numeric" }) => new Date(iso).toLocaleDateString(undefined, opts);
+const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+const ratingOf = (leg) => leg.rating?.rating || "no_progress";
+const chip = (r) => `<span class="chip"><span class="dot r-${r}" aria-hidden="true">${RATINGS[r].icon}</span>${RATINGS[r].label}</span>`;
+const needsAttention = (leg) => ["drifting", "off_course"].includes(ratingOf(leg)) && (!leg.correction || leg.correction.action === "fix-prompt");
+const flagsOf = (leg) => [...(leg.rating?.against || []).map((t) => ({ t, bad: true })), ...(leg.rating?.off_goal || []).map((t) => ({ t, bad: false }))];
+
+// Theme ---------------------------------------------------------------
+(function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem("bearing-theme"); } catch {}
+  if (saved) document.documentElement.dataset.theme = saved;
+  $("#themeBtn").onclick = () => {
+    const dark = document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("bearing-theme", next); } catch {}
+  };
+})();
+
+// API -----------------------------------------------------------------
+async function api(path, body) {
+  const opts = body ? { method: "POST", headers: { "Content-Type": "application/json", "X-Bearing": "1" }, body: JSON.stringify(body) } : {};
+  let res;
+  try { res = await fetch(path, opts); }
+  catch { throw new Error("Can't reach Bearing. Is it still running in your terminal? Start it again with: bearing"); }
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 404 && data.error === "Not found") throw new Error("This Bearing server is out of date. Stop it (Ctrl+C) and start it again with: bearing");
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+
+async function loadProjects(select) {
+  const list = await api("/api/projects");
+  const sel = $("#projectSelect");
+  sel.innerHTML = list.map((p) => `<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("");
+  if (!list.length) { state.tab = "new"; render(); return; }
+  let last = select || null;
+  if (!last) try { last = localStorage.getItem("bearing-project"); } catch {}
+  state.project = list.some((p) => p.name === last) ? last : list[0].name;
+  try { localStorage.setItem("bearing-project", state.project); } catch {}
+  sel.value = state.project;
+  sel.onchange = () => { state.project = sel.value; if (state.tab === "new") state.tab = "overview"; try { localStorage.setItem("bearing-project", sel.value); } catch {}; loadProject(); };
+  await loadProject();
+}
+
+async function loadProject() {
+  try {
+    state.data = await api(`/api/p/${encodeURIComponent(state.project)}`);
+  } catch (e) {
+    state.data = null;
+    $("#view").innerHTML = `<div class="empty"><h2>${esc(state.project)} isn't set up yet</h2><p>${esc(e.message)}</p>
+      <p class="small muted">Run <code>logbook</code>, then <code>find-bearing</code> and <code>confirm</code> for this project.</p></div>`;
+    return;
+  }
+  $("#updateBtn").disabled = state.data.updating;
+  $("#updateBtn").textContent = state.data.updating ? "Updating…" : "Update now";
+  render();
+}
+
+$("#updateBtn").onclick = async () => {
+  $("#updateBtn").disabled = true; $("#updateBtn").textContent = "Updating…";
+  try { await api(`/api/p/${encodeURIComponent(state.project)}/update`, {}); } catch (e) { alert(e.message); }
+  // Poll until the background update releases its lock.
+  const poll = setInterval(async () => {
+    const d = await api(`/api/p/${encodeURIComponent(state.project)}`).catch(() => null);
+    if (d && !d.updating) { clearInterval(poll); state.data = d; $("#updateBtn").disabled = false; $("#updateBtn").textContent = "Update now"; render(); }
+  }, 4000);
+};
+
+// Tabs ----------------------------------------------------------------
+function renderTabs() {
+  $("#tabs").innerHTML = TABS.map(([id, label]) =>
+    `<button role="tab" aria-selected="${state.tab === id}" data-tab="${id}">${label}</button>`).join("");
+  $("#tabs").querySelectorAll("button").forEach((b) => b.onclick = () => { state.tab = b.dataset.tab; location.hash = b.dataset.tab; render(); });
+}
+function render() {
+  renderTabs();
+  if (state.tab === "new") { $("#view").innerHTML = viewNew(); bindNew(); return; }
+  if (!state.data) return;
+  if (state.data.onboarding) { $("#view").innerHTML = viewOnboarding(); bindOnboarding(); return; }
+  if (state.data.star.status === "draft") { $("#view").innerHTML = viewReview(); bindReview(); return; }
+  const views = { overview: viewOverview, map: viewMap, logbook: viewLogbook, star: viewStar, spend: viewSpend };
+  $("#view").innerHTML = !state.data.legs.length && state.tab !== "star" ? viewNoSessions() : views[state.tab]();
+  const launch = $("#launchBtn");
+  if (launch) launch.onclick = launchClaude;
+  bindLegLinks();
+  if (state.tab === "map") bindMap();
+  if (state.tab === "logbook") bindLogbook();
+  if (state.tab === "spend") bindSpend();
+}
+function bindLegLinks() {
+  document.querySelectorAll("[data-leg]").forEach((el) => {
+    if (el.classList.contains("cell") || el.classList.contains("hit")) return;
+    el.onclick = () => openLeg(+el.dataset.leg);
+    el.onkeydown = (e) => { if (e.key === "Enter") openLeg(+el.dataset.leg); };
+  });
+}
+
+// Overview ------------------------------------------------------------
+function goalStats() {
+  const { star, legs } = state.data;
+  return star.goals.map((g) => {
+    const hits = legs.filter((l) => l.rating?.goals_advanced?.includes(g.id));
+    return { ...g, count: hits.length, last: hits[hits.length - 1] };
+  });
+}
+function viewOverview() {
+  const { star, legs } = state.data;
+  const rated = legs.filter((l) => l.rating);
+  const on = rated.filter((l) => ["on_course", "earlier_heading"].includes(ratingOf(l))).length;
+  const attention = legs.filter(needsAttention);
+  const cost = legs.reduce((s, l) => s + l.cost_usd, 0);
+  const prompts = legs.reduce((s, l) => s + l.prompts, 0);
+  const committed = legs.filter((l) => l.commits.length).length;
+  const goals = goalStats();
+  const max = Math.max(1, ...goals.map((g) => g.count));
+  const openMilestones = star.milestones.filter((m) => m.status !== "done");
+  const recent = legs.slice(-3).reverse();
+
+  return `
+  <div class="header-row"><h1 style="flex:1;min-width:260px">${esc(star.one_liner)}</h1><button class="btn primary" id="launchBtn">Open in Claude Code</button></div>
+  <p class="sub">North Star ${star.status === "confirmed" ? "confirmed " + esc(star.confirmed_on) : "<b>draft — not yet confirmed</b>"} · ${legs.length} legs from ${fmtDate(legs[0].start)} to ${fmtDate(legs[legs.length - 1].end)}</p>
+  <div class="tiles">
+    <div class="tile"><div class="label">On course</div><div class="value">${on}<span class="muted small"> / ${rated.length}</span></div><div class="note">legs, incl. earlier headings</div></div>
+    <div class="tile"><div class="label">Needs attention</div><div class="value">${attention.length}</div><div class="note">drifting or off course</div></div>
+    <div class="tile"><div class="label">Checkpoints</div><div class="value">${committed}<span class="muted small"> / ${legs.length}</span></div><div class="note">legs with a git commit</div></div>
+    <div class="tile"><div class="label">Prompts</div><div class="value">${prompts}</div><div class="note">you typed</div></div>
+    <div class="tile"><div class="label">Est. cost</div><div class="value">${money(cost)}</div><div class="note">at API prices</div></div>
+  </div>
+  <div class="grid cols-2">
+    <div class="stack">
+      <section class="card">
+        <h2>Goals</h2>
+        ${goals.map((g) => `
+          <div class="goal">
+            <div class="id">${esc(g.id)}</div>
+            <div>${esc(g.goal)}
+              <div class="bar" role="img" aria-label="${g.count} legs advanced ${esc(g.id)}"><span style="width:${(g.count / max) * 100}%"></span></div>
+            </div>
+            <div class="meta">${g.count} ${g.count === 1 ? "leg" : "legs"} advanced it${g.last ? ` · last moved in <a href="#" data-leg="${g.last.number}">leg ${g.last.number}</a>, ${fmtDate(g.last.start)}` : " · never advanced"}</div>
+          </div>`).join("")}
+      </section>
+      <section class="card">
+        <h2>Recent legs</h2>
+        ${recent.map((l) => `<div class="attn" data-leg="${l.number}" tabindex="0" style="cursor:pointer">
+          <span class="dot r-${ratingOf(l)}" aria-hidden="true">${RATINGS[ratingOf(l)].icon}</span>
+          <div class="body"><div class="title">Leg ${l.number} · ${esc(l.entry?.headline || "")}</div>
+          <div class="small muted">${fmtDate(l.start, { weekday: "short", month: "short", day: "numeric" })} · ${RATINGS[ratingOf(l)].label}</div></div></div>`).join("")}
+      </section>
+    </div>
+    <div class="stack">
+      <section class="card">
+        <h2>Needs your attention</h2>
+        ${attention.length ? attention.map((l) => `
+          <div class="attn">
+            <span class="dot r-${ratingOf(l)}" aria-hidden="true">${RATINGS[ratingOf(l)].icon}</span>
+            <div class="body">
+              <div class="title">Leg ${l.number} · ${RATINGS[ratingOf(l)].label}</div>
+              <div class="small" style="color:var(--text-2)">${esc(l.rating.note)}</div>
+            </div>
+            <button class="btn" data-leg="${l.number}">Review</button>
+          </div>`).join("") : `<p class="muted">Nothing drifting. Every flagged leg has been handled.</p>`}
+      </section>
+      <section class="card">
+        <h2>Milestones still open</h2>
+        ${openMilestones.length ? `<ul class="clean">${openMilestones.map((m) => `<li>${m.status === "in_progress" ? "🔄" : "⬜"} ${esc(m.name)}</li>`).join("")}</ul>` : `<p class="muted">All milestones done.</p>`}
+      </section>
+      ${star.deferred?.length ? `<section class="card"><h2>Deferred</h2><ul class="clean">${star.deferred.map((d) => `<li>${esc(d.item)} <span class="muted small">· leg ${d.leg}</span></li>`).join("")}</ul></section>` : ""}
+    </div>
+  </div>`;
+}
+
+// Course map ----------------------------------------------------------
+function viewMap() {
+  const { star, legs } = state.data;
+  const changes = new Set(star.course_changes.filter((c) => c.status !== "rejected").map((c) => c.leg));
+  // Columns: one per leg, plus a thin divider column before each course change.
+  const cols = [];
+  legs.forEach((l) => { if (changes.has(l.number)) cols.push({ change: l.number }); cols.push({ leg: l }); });
+  const template = `max-content ${cols.map((c) => c.change ? "8px" : "26px").join(" ")}`;
+  const row = (label, cellFn) => `<div class="rowlabel">${label}</div>` + cols.map((c) => c.change ? `<div class="change" title="Course change at leg ${c.change}"></div>` : cellFn(c.leg)).join("");
+  const showDate = (l, i) => i === 0 || fmtDate(l.start) !== fmtDate(legs[i - 1].start);
+
+  const header = `<div class="rowlabel"></div>` + cols.map((c) => {
+    if (c.change) return `<div></div>`;
+    return `<div class="colhead">${c.leg.number}</div>`;
+  }).join("");
+  const ratingRow = row("<b>Rating</b>", (l) => {
+    const r = ratingOf(l);
+    return `<button class="cell r-${r}${l.correction ? " fixed" : ""}" data-leg="${l.number}" data-kind="rating" aria-label="Leg ${l.number}: ${RATINGS[r].label}">${RATINGS[r].icon}</button>`;
+  });
+  const goalRows = star.goals.map((g) => row(`<b>${esc(g.id)}</b><span title="${esc(g.goal)}">${esc(shorten(g.goal, 34))}</span>`, (l) => {
+    const hit = l.rating?.goals_advanced?.includes(g.id);
+    return `<button class="cell${hit ? " hit" : ""}" data-leg="${l.number}" data-kind="goal" data-goal="${esc(g.id)}" aria-label="Leg ${l.number} ${hit ? "advanced" : "did not advance"} ${esc(g.id)}"></button>`;
+  })).join("");
+  const flagRow = row("<b>Flags</b>off-goal work", (l) => {
+    const f = flagsOf(l);
+    if (!f.length) return `<button class="cell" data-leg="${l.number}" data-kind="flags" aria-label="Leg ${l.number}: no flags" style="background:transparent"></button>`;
+    const bad = f.some((x) => x.bad);
+    return `<button class="cell flag${bad ? " bad" : ""}" data-leg="${l.number}" data-kind="flags" aria-label="Leg ${l.number}: ${f.length} flags"><span style="color:var(--text)">${f.length}</span></button>`;
+  });
+  const dateRow = `<div class="rowlabel"></div>` + cols.map((c, i) => c.change ? `<div></div>` :
+    `<div class="colhead" style="writing-mode:vertical-rl;transform:rotate(180deg);height:46px">${showDate(c.leg, legs.indexOf(c.leg)) ? fmtDate(c.leg.start) : ""}</div>`).join("");
+
+  return `
+  <h1>Course map</h1>
+  <p class="sub">Every leg of work, left to right. Blue squares mark the goals a leg moved forward; vertical lines are course changes you accepted. Click any square for the full Logbook entry.</p>
+  <section class="card">
+    <div class="map-scroll"><div class="map" style="grid-template-columns:${template}">
+      ${header}${ratingRow}${goalRows}${flagRow}${dateRow}
+    </div></div>
+    <div class="legend">
+      ${Object.entries(RATINGS).map(([k, v]) => `<span><span class="dot r-${k}">${v.icon}</span>${v.label}</span>`).join("")}
+      <span><span class="swatch" style="background:var(--accent)"></span>Advanced goal</span>
+      <span><span class="swatch" style="box-shadow:inset 0 0 0 2px var(--critical)"></span>Conflicts with a non-goal</span>
+      <span><span class="swatch" style="box-shadow:inset 0 0 0 2px var(--warning)"></span>Off-goal work</span>
+      <span><span style="width:3px;height:14px;display:inline-block;background:var(--text-2);border-radius:2px;opacity:.6"></span>Course change</span>
+      <span><span class="swatch" style="background:var(--text);border-radius:50%;width:8px;height:8px"></span>Corrected</span>
+    </div>
+  </section>
+  <section class="card" style="margin-top:16px">
+    <h2>Course changes</h2>
+    <table><thead><tr><th>Leg</th><th>From</th><th>To</th><th>Who</th><th>Status</th></tr></thead><tbody>
+    ${star.course_changes.map((c) => `<tr><td><a href="#" data-leg="${c.leg}">${c.leg}</a></td><td>${esc(c.from)}</td><td>${esc(c.to)}</td><td>${whoPill(c.made_by)}</td><td>${esc(c.status)}</td></tr>`).join("")}
+    </tbody></table>
+  </section>`;
+}
+function shorten(s, n) { s = String(s); return s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s; }
+function whoPill(who) { return who === "you" ? `<span class="pill you">You</span>` : who === "claude" ? `<span class="pill claude">Claude, unasked</span>` : `<span class="pill">Unclear</span>`; }
+
+function bindMap() {
+  const tip = $("#tip");
+  const byNum = Object.fromEntries(state.data.legs.map((l) => [l.number, l]));
+  document.querySelectorAll(".map .cell").forEach((cell) => {
+    const l = byNum[cell.dataset.leg];
+    const show = (e) => {
+      let extra = "";
+      if (cell.dataset.kind === "goal") extra = l.rating?.goals_advanced?.includes(cell.dataset.goal) ? `Advanced ${cell.dataset.goal}` : `Didn't advance ${cell.dataset.goal}`;
+      else extra = l.rating?.note || "";
+      tip.innerHTML = `<b>Leg ${l.number} · ${fmtDate(l.start)} · ${RATINGS[ratingOf(l)].label}</b>${esc(l.entry?.headline || "")}<div style="margin-top:4px;opacity:.8">${cell.dataset.kind === "flags" ? flagsOf(l).map((f) => (f.bad ? "✕ " : "! ") + esc(f.t)).join("<br>") || "No flags" : esc(extra)}</div>`;
+      tip.classList.add("show");
+      const r = cell.getBoundingClientRect();
+      const x = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2));
+      const y = r.top - tip.offsetHeight - 8 < 8 ? r.bottom + 8 : r.top - tip.offsetHeight - 8;
+      tip.style.left = x + "px"; tip.style.top = y + "px";
+    };
+    cell.onmouseenter = show; cell.onfocus = show;
+    cell.onmouseleave = () => tip.classList.remove("show"); cell.onblur = () => tip.classList.remove("show");
+    cell.onclick = () => { tip.classList.remove("show"); openLeg(l.number); };
+  });
+}
+
+// Logbook -------------------------------------------------------------
+function viewLogbook() {
+  const decisions = state.data.legs.flatMap((l) => l.entry?.decisions || []);
+  const byClaude = decisions.filter((d) => d.made_by === "claude").length;
+  const filters = [["all", "All"], ["attention", "Needs attention"], ["on_course", "On course"], ["earlier_heading", "Earlier heading"], ["no_progress", "No progress"]];
+  return `
+  <h1>Logbook</h1>
+  <p class="sub">One entry per leg, newest first. ${decisions.length} decisions recorded — ${byClaude} made by Claude without being asked.</p>
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="Search entries…" value="${esc(state.query)}" aria-label="Search entries">
+    <div class="seg" role="group" aria-label="Filter by rating">${filters.map(([k, v]) => `<button data-filter="${k}" aria-pressed="${state.filter === k}">${v}</button>`).join("")}</div>
+  </div>
+  <div class="stack" id="entries">${logbookEntries()}</div>`;
+}
+function logbookEntries() {
+  const { legs, star } = state.data;
+  const q = state.query.toLowerCase();
+  const changes = Object.fromEntries(star.course_changes.filter((c) => c.status !== "rejected").map((c) => [c.leg, c]));
+  const shown = legs.filter((l) => l.entry).filter((l) => {
+    if (state.filter === "attention" && !needsAttention(l)) return false;
+    if (!["all", "attention"].includes(state.filter) && ratingOf(l) !== state.filter) return false;
+    return !q || JSON.stringify(l.entry).toLowerCase().includes(q);
+  }).reverse();
+  if (!shown.length) return `<p class="muted">No entries match.</p>`;
+  return shown.map((l) => `
+    <article class="card entry" data-leg="${l.number}" tabindex="0">
+      <div class="head">${chip(ratingOf(l))}<span class="muted small">Leg ${l.number} · ${fmtDate(l.start, { weekday: "short", month: "short", day: "numeric" })} · ${l.prompts} prompts${l.commits.length ? ` · ${l.commits.length} commit${l.commits.length > 1 ? "s" : ""}` : ""}</span>
+      ${l.correction ? `<span class="pill">${FIX_LABELS[l.correction.action]}</span>` : ""}</div>
+      <div class="headline">${esc(l.entry.headline)}</div>
+      <p>${esc(l.entry.summary)}</p>
+    </article>
+    ${changes[l.number] && state.filter === "all" && !q ? `<div class="change-banner">Course change: ${esc(shorten(changes[l.number].to, 90))}</div>` : ""}`).join("");
+}
+function bindLogbook() {
+  $("#q").oninput = (e) => { state.query = e.target.value; $("#entries").innerHTML = logbookEntries(); bindLegLinks(); };
+  document.querySelectorAll("[data-filter]").forEach((b) => b.onclick = () => { state.filter = b.dataset.filter; render(); });
+}
+
+// North Star ----------------------------------------------------------
+function viewStar() {
+  const s = state.data.star;
+  const icon = { done: "✅", in_progress: "🔄", not_started: "⬜" };
+  return `
+  <h1>North Star</h1>
+  <p class="sub">${esc(s.one_liner)}<br><span class="small">${s.status === "confirmed" ? "Confirmed " + esc(s.confirmed_on) : "Draft — confirm it with <code>python3 -m bearing confirm</code>"}</span></p>
+  <div class="grid cols-2">
+    <div class="stack">
+      <section class="card"><h2>Goals</h2>${s.goals.map((g) => `<div class="goal"><div class="id">${esc(g.id)}</div><div><b style="font-weight:600">${esc(g.goal)}</b><div class="small muted" style="margin-top:4px">${esc(g.why)}</div></div></div>`).join("")}</section>
+      <section class="card"><h2>Milestones</h2><ul class="clean" style="list-style:none;padding:0">${s.milestones.map((m) => `<li>${icon[m.status]} <b style="font-weight:600">${esc(m.name)}</b><div class="small muted">${esc(m.evidence)}</div></li>`).join("")}</ul></section>
+    </div>
+    <div class="stack">
+      <section class="card"><h2>Non-goals</h2><ul class="clean">${s.non_goals.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></section>
+      <section class="card"><h2>Constraints</h2><ul class="clean">${s.constraints.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></section>
+      ${s.deferred?.length ? `<section class="card"><h2>Deferred</h2><ul class="clean">${s.deferred.map((d) => `<li>${esc(d.item)} <span class="muted small">· leg ${d.leg}, ${esc(d.on)}</span></li>`).join("")}</ul></section>` : ""}
+      ${s.questions?.length ? `<section class="card"><h2>Open questions</h2><ul class="clean">${s.questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ul></section>` : ""}
+    </div>
+  </div>`;
+}
+
+// Spend ---------------------------------------------------------------
+function viewSpend() {
+  const { legs } = state.data;
+  const total = legs.reduce((s, l) => s + l.cost_usd, 0);
+  const out = legs.reduce((s, l) => s + l.tokens.output, 0);
+  const cacheRead = legs.reduce((s, l) => s + l.tokens.cache_read, 0);
+  const productive = legs.filter((l) => l.rating?.goals_advanced?.length);
+  const prodCost = productive.reduce((s, l) => s + l.cost_usd, 0);
+  const unpriced = [...new Set(legs.flatMap((l) => l.unpriced_models))];
+  return `
+  <h1>Spend</h1>
+  <p class="sub">Estimated from token counts at Anthropic API list prices. On a Pro or Max plan you don't pay these amounts — use them to compare legs.${unpriced.length ? ` Not priced: ${esc(unpriced.join(", "))}.` : ""}</p>
+  <div class="tiles">
+    <div class="tile"><div class="label">Total</div><div class="value">${money(total)}</div><div class="note">${legs.length} legs</div></div>
+    <div class="tile"><div class="label">Spent on goal progress</div><div class="value">${Math.round((prodCost / total) * 100)}%</div><div class="note">${money(prodCost)} in legs that advanced a goal</div></div>
+    <div class="tile"><div class="label">Average leg</div><div class="value">${money(total / legs.length)}</div></div>
+    <div class="tile"><div class="label">Output tokens</div><div class="value">${compact(out)}</div><div class="note">${compact(cacheRead)} cache reads</div></div>
+  </div>
+  <section class="card">
+    <h2>Estimated cost per leg</h2>
+    <div class="seg" role="group" aria-label="View" style="margin-bottom:12px">
+      <button data-spend="chart" aria-pressed="${state.spendView !== "table"}">Chart</button>
+      <button data-spend="table" aria-pressed="${state.spendView === "table"}">Table</button>
+    </div>
+    ${state.spendView === "table" ? spendTable() : `<div id="spendChart"></div><p class="small muted" style="margin:8px 0 0">Faded bars are legs that didn't advance any goal.</p>`}
+  </section>`;
+}
+function spendTable() {
+  return `<div style="overflow-x:auto"><table><thead><tr><th>Leg</th><th>Date</th><th>Headline</th><th>Rating</th><th class="num">Output tokens</th><th class="num">Est. cost</th></tr></thead><tbody>
+  ${state.data.legs.map((l) => `<tr><td><a href="#" data-leg="${l.number}">${l.number}</a></td><td>${fmtDate(l.start)}</td><td>${esc(l.entry?.headline || "")}</td><td>${RATINGS[ratingOf(l)].label}</td><td class="num">${compact(l.tokens.output)}</td><td class="num">${money(l.cost_usd)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function bindSpend() {
+  document.querySelectorAll("[data-spend]").forEach((b) => b.onclick = () => { state.spendView = b.dataset.spend; render(); });
+  const host = $("#spendChart");
+  if (!host) return;
+  const legs = state.data.legs;
+  const W = Math.max(host.clientWidth, 320), H = 260, pad = { l: 44, r: 8, t: 10, b: 26 };
+  const max = Math.max(...legs.map((l) => l.cost_usd));
+  const step = niceStep(max / 4);
+  const top = Math.ceil(max / step) * step;
+  const bw = (W - pad.l - pad.r) / legs.length;
+  const y = (v) => pad.t + (H - pad.t - pad.b) * (1 - v / top);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Estimated cost per leg">`;
+  for (let v = 0; v <= top + 1e-9; v += step) svg += `<line class="gridline" x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">$${v}</text>`;
+  legs.forEach((l, i) => {
+    const x = pad.l + i * bw + 1, w = Math.max(2, bw - 2), h = H - pad.b - y(l.cost_usd);
+    const dim = !l.rating?.goals_advanced?.length;
+    const r = Math.min(4, w / 2, h);
+    const yb = H - pad.b;
+    svg += `<path class="barmark${dim ? " dim" : ""}" d="M${x},${yb} V${yb - h + r} Q${x},${yb - h} ${x + r},${yb - h} H${x + w - r} Q${x + w},${yb - h} ${x + w},${yb - h + r} V${yb} Z"/>`;
+    if (i % Math.ceil(legs.length / 15) === 0 || i === legs.length - 1) svg += `<text class="axis" x="${x + w / 2}" y="${H - 8}" text-anchor="middle">${l.number}</text>`;
+    svg += `<rect class="hit" data-leg="${l.number}" x="${pad.l + i * bw}" y="${pad.t}" width="${bw}" height="${H - pad.t - pad.b}"/>`;
+  });
+  host.innerHTML = svg + `</svg>`;
+  const tip = $("#tip");
+  const byNum = Object.fromEntries(legs.map((l) => [l.number, l]));
+  host.querySelectorAll(".hit").forEach((el) => {
+    const l = byNum[el.dataset.leg];
+    el.onmousemove = (e) => {
+      tip.innerHTML = `<b>Leg ${l.number} · ${fmtDate(l.start)} · ${money(l.cost_usd)}</b>${esc(l.entry?.headline || "")}<div style="opacity:.8;margin-top:4px">${compact(l.tokens.output)} output tokens · ${RATINGS[ratingOf(l)].label}</div>`;
+      tip.classList.add("show");
+      tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - tip.offsetHeight - 12) + "px";
+    };
+    el.onmouseleave = () => tip.classList.remove("show");
+    el.onclick = () => { tip.classList.remove("show"); openLeg(l.number); };
+  });
+}
+function niceStep(raw) { const p = Math.pow(10, Math.floor(Math.log10(raw))); const n = raw / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; }
+
+// Leg drawer ----------------------------------------------------------
+async function openLeg(number) {
+  const l = state.data.legs.find((x) => x.number === number);
+  if (!l) return;
+  const e = l.entry || { headline: "", summary: "", built: [], decisions: [], open_items: [], direction: "" };
+  const r = ratingOf(l);
+  const drawer = $("#drawer");
+  drawer.innerHTML = `
+    <button class="icon-btn close" aria-label="Close" id="closeDrawer">✕</button>
+    <div class="small muted">Leg ${l.number} · ${fmtDate(l.start, { weekday: "long", month: "long", day: "numeric" })}</div>
+    <h2 style="font-size:20px;margin:4px 40px 0 0">${esc(e.headline)}</h2>
+    <div class="facts"><span>${fmtTime(l.start)}–${fmtTime(l.end)}</span><span>${l.active_minutes} min active</span><span>${l.prompts} prompts</span><span>${l.files_touched} file${l.files_touched === 1 ? "" : "s"} edited</span><span>${money(l.cost_usd)} est.</span></div>
+    ${chip(r)} ${l.rating?.goals_advanced?.length ? `<span class="small muted">&nbsp;advanced ${l.rating.goals_advanced.map(esc).join(", ")}</span>` : ""}
+    ${l.rating ? `<p style="margin:10px 0 0">${esc(l.rating.note)}</p>` : ""}
+    ${flagsOf(l).map((f) => `<div class="flag-line">${f.bad ? "✕ Conflicts:" : "! Off-goal:"} ${esc(f.t)}</div>`).join("")}
+    <h3>Summary</h3><p style="margin:0;color:var(--text-2)">${esc(e.summary)}</p>
+    ${e.built.length ? `<h3>Built or changed</h3><ul class="clean small">${e.built.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
+    ${e.decisions.length ? `<h3>Decisions</h3><ul class="clean small" style="list-style:none;padding:0">${e.decisions.map((d) => `<li class="decision"><span>${esc(d.decision)}</span>${whoPill(d.made_by)}</li>`).join("")}</ul>` : ""}
+    ${e.open_items.length ? `<h3>Left open</h3><ul class="clean small">${e.open_items.map((o) => `<li>${esc(o)}</li>`).join("")}</ul>` : ""}
+    ${e.direction ? `<h3>Heading</h3><p class="small" style="margin:0;color:var(--text-2)">${esc(e.direction)}</p>` : ""}
+    <h3>Checkpoints</h3><div id="deps" class="small muted">Checking git…</div>
+    <h3>Course correct</h3><div id="correct"></div>`;
+  drawer.classList.add("open"); drawer.setAttribute("aria-hidden", "false"); $("#scrim").classList.add("open");
+  $("#closeDrawer").onclick = closeDrawer; $("#closeDrawer").focus();
+  renderCorrect(l, null);
+  try {
+    const d = await api(`/api/p/${encodeURIComponent(state.project)}/leg/${number}`);
+    $("#deps").innerHTML = (d.commits?.length ? d.commits.map((c) => `<div><code>${esc(c.sha)}</code> ${esc(c.subject)}</div>`).join("") : `No commits in this leg, so there's no checkpoint to roll back to.`)
+      + (d.later_commits.length ? `<div style="margin-top:8px">${d.later_commits.length} later commit${d.later_commits.length > 1 ? "s" : ""} build on it: ${d.later_commits.map((c) => `<code>${esc(c.sha)}</code>`).join(" ")}</div>` : "")
+      + (d.later_legs.length ? `<div style="margin-top:4px">Later legs edited the same files: ${d.later_legs.map((n) => `<a href="#" data-goto="${n}">${n}</a>`).join(", ")}</div>` : "");
+    $("#deps").querySelectorAll("[data-goto]").forEach((a) => a.onclick = (ev) => { ev.preventDefault(); openLeg(+a.dataset.goto); });
+    renderCorrect(l, d);
+  } catch (err) { $("#deps").textContent = err.message; }
+}
+function renderCorrect(l, deps) {
+  const box = $("#correct");
+  if (l.correction && l.correction.action !== "fix-prompt") {
+    box.innerHTML = `<div class="notice">${FIX_LABELS[l.correction.action]} on ${esc(l.correction.on)}${l.correction.note ? ` — ${esc(l.correction.note)}` : ""}${l.correction.branch ? ` (branch <code>${esc(l.correction.branch)}</code>)` : ""}</div>`;
+    return;
+  }
+  const canRollback = deps && deps.commits?.length;
+  box.innerHTML = `
+    ${l.correction ? `<div class="notice" style="margin:0 0 10px">Fix prompt requested on ${esc(l.correction.on)}. Once Claude has fixed it, accept or defer the leg to close it out.</div>` : ""}
+    <p class="small muted" style="margin:0">Was this leg what you wanted? Pick what to do with it.</p>
+    <div class="actions">
+      <div class="action-row"><input id="acceptNote" placeholder="Why it was intended…" aria-label="Why it was intended"><button class="btn" id="acceptBtn">Accept</button></div>
+      <div class="action-row"><input id="deferNote" placeholder="What to leave for later…" aria-label="What to leave for later"><button class="btn" id="deferBtn">Defer</button></div>
+      <div class="action-row"><button class="btn" id="fixBtn">Get a fix prompt</button>
+        <button class="btn danger" id="rollbackBtn" ${canRollback ? "" : "disabled"} title="${canRollback ? "Revert this leg's commits on a review branch" : "No commits in this leg"}">Roll back…</button></div>
+    </div>
+    <div id="correctResult"></div>`;
+  const run = async (action, note) => {
+    const out = $("#correctResult");
+    out.innerHTML = `<div class="notice">Working…</div>`;
+    try {
+      const res = await api(`/api/p/${encodeURIComponent(state.project)}/correct`, { leg: l.number, action, note });
+      out.innerHTML = res.prompt
+        ? `<div class="notice">${esc(res.message)}</div><textarea class="prompt" readonly id="fixText">${esc(res.prompt)}</textarea><button class="btn" id="copyBtn">Copy</button>`
+        : `<div class="notice">${esc(res.message)}</div>`;
+      if (res.prompt) $("#copyBtn").onclick = () => { navigator.clipboard.writeText(res.prompt).then(() => $("#copyBtn").textContent = "Copied"); };
+      const fresh = await api(`/api/p/${encodeURIComponent(state.project)}`);
+      state.data = fresh;
+      if (state.tab !== "spend") { const scroll = window.scrollY; render(); window.scrollTo(0, scroll); }
+    } catch (e) { out.innerHTML = `<div class="notice err">${esc(e.message)}</div>`; }
+  };
+  $("#acceptBtn").onclick = () => run("accept", $("#acceptNote").value);
+  $("#deferBtn").onclick = () => run("defer", $("#deferNote").value);
+  $("#fixBtn").onclick = () => run("fix-prompt", "");
+  $("#rollbackBtn").onclick = () => {
+    if (confirm(`Revert leg ${l.number}'s commits on a new branch (bearing/rollback-leg-${l.number})?\n\nYour current branch stays as it is. If later work conflicts, nothing is changed.`)) run("rollback", "");
+  };
+}
+function closeDrawer() {
+  $("#drawer").classList.remove("open"); $("#drawer").setAttribute("aria-hidden", "true"); $("#scrim").classList.remove("open");
+}
+$("#scrim").onclick = closeDrawer;
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+document.addEventListener("click", (e) => { const a = e.target.closest("a[href='#']"); if (a) e.preventDefault(); });
+
+// No sessions yet -----------------------------------------------------
+function viewNoSessions() {
+  const star = state.data.star;
+  const next = star.milestones.find((m) => m.status !== "done");
+  return `
+  <h1>${esc(star.one_liner)}</h1>
+  <p class="sub">North Star confirmed ${esc(star.confirmed_on)} · no Claude Code sessions yet</p>
+  <section class="card" style="max-width:640px">
+    <h2>Ready for your first session</h2>
+    <p style="margin:0 0 12px;color:var(--text-2)">Claude Code will start in <code>${esc(state.data.path)}</code>, already briefed on your goals. It'll propose a plan for the first milestone${next ? ` — <b>${esc(next.name)}</b>` : ""} — and wait for your go-ahead.</p>
+    <button class="btn primary" id="launchBtn">Open in Claude Code</button>
+    <p class="small muted" style="margin:12px 0 0">After each session, Bearing writes the Logbook entry and checks it against your goals. Come back here to see the course map.</p>
+  </section>`;
+}
+async function launchClaude() {
+  const btn = $("#launchBtn");
+  btn.disabled = true; btn.textContent = "Opening…";
+  try {
+    const res = await api(`/api/p/${encodeURIComponent(state.project)}/launch`, {});
+    btn.textContent = "Opened in Terminal";
+  } catch (e) { alert(e.message); btn.disabled = false; btn.textContent = "Open in Claude Code"; }
+}
+
+// New project ---------------------------------------------------------
+const NEW_KEY = "bearing-new-chat";
+function loadChat() { try { return JSON.parse(localStorage.getItem(NEW_KEY)) || null; } catch { return null; } }
+function saveChat() { try { localStorage.setItem(NEW_KEY, JSON.stringify(state.newChat)); } catch {} }
+function freshChat() {
+  return { messages: [{ role: "bearing", text: "What would you like to build? Describe it however it comes to mind — a sentence or two is plenty." }], draft: null, busy: false, parent: "" };
+}
+function modeSwitch() {
+  const first = !$("#projectSelect").options.length;
+  return `${first ? `<h1>Welcome to Bearing</h1><p class="sub">Bearing keeps what you build with Claude Code pointed at what you set out to build. Start with a new idea, or bring in a project you're already working on.</p>` : ""}
+  <div class="seg" role="group" aria-label="What are you adding?" style="margin-bottom:20px">
+    <button data-mode="idea" aria-pressed="${state.newMode !== "existing"}">A new idea</button>
+    <button data-mode="existing" aria-pressed="${state.newMode === "existing"}">A project I'm already building</button>
+  </div>`;
+}
+function viewNew() {
+  if (state.newMode === "existing") return modeSwitch() + viewExisting();
+  if (!state.newChat) state.newChat = loadChat() || freshChat();
+  const c = state.newChat;
+  const d = c.draft;
+  return modeSwitch() + `
+  <div class="header-row"><div><h2 style="font-size:22px">Start a new project</h2>
+  <p class="sub">Talk it through and Bearing will write your North Star — the goals every Claude Code session gets checked against.</p></div>
+  <button class="btn" id="resetChat">Start over</button></div>
+  <div class="grid ${d ? "cols-2" : ""}" style="align-items:start">
+    <section>
+      <div class="chat" id="chat">
+        ${c.messages.map((m) => `<div class="msg ${m.role === "user" ? "user" : "bearing"}">${m.role === "user" ? esc(m.text) : esc(m.text).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")}</div>`).join("")}
+        ${c.busy ? `<div class="msg bearing typing">Thinking…</div>` : ""}
+      </div>
+      <div class="composer">
+        <textarea id="chatInput" placeholder="${d ? "Ask for changes, e.g. “make the first version mobile-only”" : "Type your answer…"}" aria-label="Your message" ${c.busy ? "disabled" : ""}></textarea>
+        <button class="btn primary" id="sendBtn" ${c.busy ? "disabled" : ""}>Send</button>
+      </div>
+      <p class="small muted">Enter to send · Shift+Enter for a new line</p>
+    </section>
+    ${d ? `
+    <section class="card" style="position:sticky;top:120px;max-height:calc(100vh - 140px);overflow-y:auto">
+      <h2>Your North Star (draft)</h2>
+      <p style="margin:0 0 10px"><b style="font-weight:600">${esc(d.one_liner)}</b></p>
+      <h3>Goals</h3><ul class="clean small">${d.goals.map((g) => `<li><b>${esc(g.id)}</b> ${esc(g.goal)}</li>`).join("")}</ul>
+      <h3>Not building</h3><ul class="clean small">${d.non_goals.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
+      <h3>Milestones</h3><ol class="small" style="margin:0;padding-left:18px">${d.milestones.map((m) => `<li>${esc(m.name)}</li>`).join("")}</ol>
+      ${d.constraints.length ? `<h3>Constraints</h3><ul class="clean small">${d.constraints.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+      <h3>Create it</h3>
+      <div class="grid" style="gap:10px">
+        <div class="field"><label for="newName">Folder name</label><input id="newName" value="${esc(c.name || d.suggested_name)}"></div>
+        <div class="field"><label for="newParent">Create inside</label><input id="newParent" value="${esc(c.parent)}"></div>
+        <button class="btn primary" id="createBtn">Create project &amp; open Claude Code</button>
+        <div id="createResult"></div>
+      </div>
+    </section>` : ""}
+  </div>`;
+}
+async function bindNew() {
+  document.querySelectorAll("[data-mode]").forEach((b) => b.onclick = () => { state.newMode = b.dataset.mode; render(); });
+  if (state.newMode === "existing") return bindExisting();
+  const c = state.newChat;
+  if (!c.parent) { try { c.parent = (await api("/api/defaults")).parent; const el = $("#newParent"); if (el) el.value = c.parent; } catch {} }
+  const input = $("#chatInput");
+  if (input && !c.busy) input.focus();
+  $("#resetChat").onclick = () => { if (confirm("Clear this conversation and start over?")) { state.newChat = freshChat(); saveChat(); render(); } };
+  const send = async () => {
+    const text = input.value.trim();
+    if (!text || c.busy) return;
+    c.messages.push({ role: "user", text });
+    c.busy = true; render();
+    try {
+      const res = await api("/api/new/chat", { messages: c.messages.slice(1) });
+      c.messages.push({ role: "bearing", text: res.reply });
+      if (res.ready && res.north_star) c.draft = res.north_star;
+    } catch (e) {
+      c.messages.push({ role: "bearing", text: `Something went wrong: ${e.message}. Try sending that again.` });
+    }
+    c.busy = false; saveChat(); render();
+  };
+  $("#sendBtn").onclick = send;
+  input.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } };
+  const chatEl = $("#chat"); chatEl.lastElementChild?.scrollIntoView({ block: "nearest" });
+  const create = $("#createBtn");
+  if (create) {
+    $("#newName").oninput = (e) => { c.name = e.target.value; saveChat(); };
+    $("#newParent").oninput = (e) => { c.parent = e.target.value; saveChat(); };
+    create.onclick = async () => {
+      create.disabled = true; create.textContent = "Creating…";
+      try {
+        const res = await api("/api/new/create", { name: $("#newName").value, parent: $("#newParent").value, north_star: c.draft });
+        await api(`/api/p/${encodeURIComponent(res.name)}/launch`, {}).catch((e) => alert("Project created, but Claude Code didn't open: " + e.message));
+        state.newChat = freshChat(); saveChat();
+        state.tab = "overview";
+        await loadProjects(res.name);
+      } catch (e) {
+        $("#createResult").innerHTML = `<div class="notice err">${esc(e.message)}</div>`;
+        create.disabled = false; create.textContent = "Create project & open Claude Code";
+      }
+    };
+  }
+}
+// Existing project ----------------------------------------------------
+function viewExisting() {
+  const list = state.candidates;
+  return `
+  <h2 style="font-size:22px">Bring in a project you're already building</h2>
+  <p class="sub">Bearing reads that folder's Claude Code history, writes a Logbook entry for each sitting of work, and drafts a North Star from it for you to check. Big projects take a few minutes and use your Claude plan.</p>
+  <div class="grid cols-2" style="align-items:start">
+    <section class="card">
+      <h2>Folders you've used Claude Code in</h2>
+      ${!list ? `<p class="muted">Looking…</p>` : !list.length ? `<p class="muted">No untracked folders with Claude Code history found.</p>` :
+        list.map((c) => `<div class="candidate"><div class="body"><b style="font-weight:600">${esc(c.name)}</b>
+          <div class="p" title="${esc(c.path)}">${esc(c.path.replace(/^\/Users\/[^/]+/, "~"))}</div>
+          <div class="small muted">Last active ${fmtDate(new Date(c.last_active * 1000).toISOString())} · ${c.history_mb} MB of history</div></div>
+          <button class="btn" data-add="${esc(c.path)}">Bring in</button></div>`).join("")}
+    </section>
+    <section class="card">
+      <h2>Or enter a folder</h2>
+      <div class="field"><label for="addPath">Project folder</label><input id="addPath" placeholder="~/Desktop/my-project"></div>
+      <button class="btn primary" id="addBtn" style="margin-top:10px">Bring it in</button>
+      <div id="addResult"></div>
+    </section>
+  </div>`;
+}
+async function bindExisting() {
+  if (!state.candidates) {
+    api("/api/candidates").then((c) => { state.candidates = c; if (state.tab === "new" && state.newMode === "existing") render(); })
+      .catch(() => { state.candidates = []; render(); });
+  }
+  const add = async (path, btn) => {
+    btn.disabled = true; btn.textContent = "Starting…";
+    try {
+      const res = await api("/api/add", { path });
+      state.candidates = null; state.tab = "overview";
+      await loadProjects(res.name);
+    } catch (e) {
+      btn.disabled = false; btn.textContent = "Bring in";
+      ($("#addResult") || btn.parentElement).insertAdjacentHTML("beforeend", `<div class="notice err">${esc(e.message)}</div>`);
+    }
+  };
+  document.querySelectorAll("[data-add]").forEach((b) => b.onclick = () => add(b.dataset.add, b));
+  $("#addBtn").onclick = () => { const v = $("#addPath").value.trim(); if (v) add(v, $("#addBtn")); };
+}
+
+function viewOnboarding() {
+  const o = state.data.onboarding;
+  const pct = o.total ? Math.round((o.done / o.total) * 100) : null;
+  const steps = [["reading", "Read history"], ["logbook", "Write Logbook"], ["north_star", "Draft North Star"]];
+  const at = steps.findIndex(([k]) => k === o.stage);
+  return `
+  <h1>Finding your bearing on ${esc(state.data.name)}</h1>
+  <p class="sub">${esc(state.data.path)}</p>
+  <section class="card" style="max-width:640px">
+    ${o.stage === "error" ? `
+      <div class="notice err">${esc(o.message)}</div>
+      <button class="btn primary" id="retryAdd" style="margin-top:12px">Try again</button>
+      <p class="small muted">Logbook entries already written are kept, so trying again picks up where it stopped.</p>` : `
+      <ol class="small" style="margin:0;padding-left:18px">${steps.map(([k, label], i) => `<li style="${i < at ? "color:var(--muted)" : i === at ? "font-weight:600" : "color:var(--muted)"}">${i < at ? "✓ " : ""}${label}</li>`).join("")}</ol>
+      <div class="progress ${pct === null ? "indeterminate" : ""}"><span style="${pct === null ? "" : `width:${pct}%`}"></span></div>
+      <p style="margin:0">${esc(o.message)}</p>
+      <p class="small muted" style="margin:10px 0 0">You can leave this page — it keeps going in the background.</p>`}
+  </section>`;
+}
+function bindOnboarding() {
+  clearTimeout(state.onboardPoll);
+  const retry = $("#retryAdd");
+  if (retry) {
+    retry.onclick = async () => {
+      retry.disabled = true;
+      try { await api("/api/add", { path: state.data.path }); } catch (e) { alert(e.message); }
+      loadProject();
+    };
+    return;
+  }
+  const name = state.project;
+  state.onboardPoll = setTimeout(async () => { if (state.project === name) await loadProject(); }, 3000);
+}
+
+function viewReview() {
+  const { star, legs, name } = state.data;
+  return `
+  <h1>Check your North Star</h1>
+  <p class="sub">Bearing read ${legs.length} legs of work on <b>${esc(name)}</b> and drafted where it thinks the project is heading. Check that the goals match what you're aiming for, and keep or drop each change of direction it found.</p>
+  <div class="grid cols-2" style="align-items:start">
+    <div class="stack">
+      <section class="card">
+        <p style="margin:0 0 12px;font-size:17px"><b style="font-weight:600">${esc(star.one_liner)}</b></p>
+        <h3>Goals</h3>${star.goals.map((g) => `<div class="goal"><div class="id">${esc(g.id)}</div><div>${esc(g.goal)}<div class="small muted" style="margin-top:4px">${esc(g.why)}</div></div></div>`).join("")}
+        <h3>Not building</h3><ul class="clean small">${star.non_goals.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>
+        <h3>Milestones</h3><ul class="clean small" style="list-style:none;padding:0">${star.milestones.map((m) => `<li>${{ done: "✅", in_progress: "🔄", not_started: "⬜" }[m.status]} ${esc(m.name)}</li>`).join("")}</ul>
+      </section>
+    </div>
+    <div class="stack">
+      <section class="card">
+        <h2>Course changes</h2>
+        <p class="small muted" style="margin:-6px 0 8px">Moments the project changed direction. Keep the ones you meant; uncheck any that were drift — those legs will be judged against today's goals.</p>
+        ${star.course_changes.length ? star.course_changes.map((c) => `
+          <div class="change-row"><div><div class="small muted">Leg ${c.leg} · ${whoPill(c.made_by)}</div>
+            <div class="small" style="margin-top:4px">${esc(c.from)} → <b style="font-weight:600">${esc(c.to)}</b></div>
+            <div class="small muted" style="margin-top:4px">${esc(c.question)}</div></div>
+            <label class="check small"><input type="checkbox" data-change="${c.leg}" checked> Meant it</label></div>`).join("")
+          : `<p class="muted small">No major changes of direction found.</p>`}
+      </section>
+      <section class="card">
+        <label class="check"><input type="checkbox" id="hooksBox" checked>
+          <span><b style="font-weight:600">Brief Claude Code automatically</b><br><span class="small muted">Adds two hooks to this project's <code>.claude/settings.local.json</code> so each session starts knowing these goals and gets logged when it ends. You can remove them any time.</span></span></label>
+        <button class="btn primary" id="confirmBtn" style="margin-top:14px;width:100%">Confirm North Star</button>
+        <div id="confirmResult"></div>
+      </section>
+    </div>
+  </div>`;
+}
+function bindReview() {
+  $("#confirmBtn").onclick = async () => {
+    const reject = [...document.querySelectorAll("[data-change]")].filter((b) => !b.checked).map((b) => +b.dataset.change);
+    $("#confirmBtn").disabled = true; $("#confirmBtn").textContent = "Confirming…";
+    try {
+      await api(`/api/p/${encodeURIComponent(state.project)}/confirm`, { reject, hooks: $("#hooksBox").checked });
+      await loadProject();
+      $("#updateBtn").disabled = true; $("#updateBtn").textContent = "Updating…";
+      pollUntilUpdated();
+    } catch (e) {
+      $("#confirmResult").innerHTML = `<div class="notice err">${esc(e.message)}</div>`;
+      $("#confirmBtn").disabled = false; $("#confirmBtn").textContent = "Confirm North Star";
+    }
+  };
+}
+function pollUntilUpdated() {
+  const name = state.project;
+  const poll = setInterval(async () => {
+    const d = await api(`/api/p/${encodeURIComponent(name)}`).catch(() => null);
+    if (!d || state.project !== name) return clearInterval(poll);
+    if (!d.updating) { clearInterval(poll); state.data = d; $("#updateBtn").disabled = false; $("#updateBtn").textContent = "Update now"; render(); }
+  }, 4000);
+}
+
+$("#newBtn").onclick = () => { state.tab = "new"; location.hash = "new"; render(); };
+
+// Boot ----------------------------------------------------------------
+const fromHash = location.hash.slice(1);
+if (TABS.some(([id]) => id === fromHash) || fromHash === "new") state.tab = fromHash;
+renderTabs();
+loadProjects().catch((e) => { $("#view").innerHTML = `<div class="empty">Couldn't reach Bearing: ${esc(e.message)}</div>`; });
+window.addEventListener("resize", () => { if (state.tab === "spend") bindSpend(); });
+</script>
+</body>
+</html>
